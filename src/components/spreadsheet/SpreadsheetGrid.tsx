@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BudgetItem, BudgetSummary } from '../../types/finance';
 import { formatCurrency, formatPercent } from '../../utils/financialFormulas';
-import { Plus, Trash2, HelpCircle } from 'lucide-react';
+import { Plus, Trash2, HelpCircle, CheckCircle2, AlertCircle, TrendingUp, Info } from 'lucide-react';
 
 interface SpreadsheetGridProps {
   items: BudgetItem[];
@@ -36,177 +36,293 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
   const getCategoryBadge = (cat: string) => {
     switch (cat) {
       case 'NECESSIDADE':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">50% NECESSIDADE</span>;
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200 inline-flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> 50% Necessidade
+          </span>
+        );
       case 'DESEJO':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">30% DESEJO</span>;
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200 inline-flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span> 30% Desejo
+          </span>
+        );
       case 'INVESTIMENTO':
-        return <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">20% INVESTIMENTO</span>;
+        return (
+          <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> 20% Investimento
+          </span>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="bg-slate-900 rounded-b-2xl border border-slate-800 overflow-hidden shadow-xl">
-      {/* Barra de Fórmula estilo Excel */}
-      <div className="bg-slate-950 px-4 py-2 border-b border-slate-800 flex items-center gap-3 text-xs font-mono">
-        <span className="text-emerald-400 font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+    <div className="bg-white rounded-b-2xl border border-slate-200 overflow-hidden shadow-sm">
+      {/* 1. PAINEL DIDÁTICO DE ENTRADA: RENDA LÍQUIDA */}
+      <div className="p-4 sm:p-5 bg-gradient-to-r from-blue-50/60 via-slate-50 to-indigo-50/40 border-b border-slate-200">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">💰</span>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900">
+                Quanto você recebe por mês? (Renda Líquida)
+              </h2>
+            </div>
+            <p className="text-xs text-slate-500 mt-0.5 max-w-xl">
+              Digite seu salário líquido (o valor real que cai na conta após impostos). A planilha calcula automaticamente os limites ideais de cada categoria.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 w-full md:w-auto">
+            {editingIncome ? (
+              <div className="flex items-center gap-1.5 w-full md:w-auto">
+                <span className="text-xs font-bold text-slate-500">R$</span>
+                <input
+                  type="number"
+                  value={tempIncome}
+                  onChange={(e) => setTempIncome(e.target.value)}
+                  className="bg-white border-2 border-blue-600 rounded-xl px-3 py-2 text-sm font-bold text-slate-900 w-36 focus:outline-none shadow-sm"
+                  autoFocus
+                />
+                <button
+                  onClick={handleIncomeSubmit}
+                  className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
+                >
+                  Confirmar
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5 bg-white border border-slate-200/90 rounded-2xl p-2 px-3.5 shadow-sm w-full md:w-auto justify-between md:justify-start">
+                <div className="font-mono text-base sm:text-lg font-extrabold text-blue-700">
+                  {formatCurrency(totalIncome)}
+                </div>
+                <button
+                  onClick={() => {
+                    setTempIncome(totalIncome.toString());
+                    setEditingIncome(true);
+                  }}
+                  className="text-xs font-bold text-blue-700 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Alterar Renda
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 2. OS 3 PILARES DIDÁTICOS DA REGRA 50/30/20 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-200/80">
+          {/* Pilar 1: Necessidades (50%) */}
+          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="font-bold text-blue-800 flex items-center gap-1">
+                🏠 50% Necessidades
+              </span>
+              <span className="text-[11px] font-mono text-slate-500">Teto: {formatCurrency(totalIncome * 0.5)}</span>
+            </div>
+            <div className="text-xs text-slate-500 mb-2">
+              Contas básicas (moradia, luz, água, alimentação básica, saúde).
+            </div>
+            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+              <span className="text-slate-600">Gasto Atual:</span>
+              <span className="font-bold font-mono text-slate-900">{formatCurrency(summary.categories.necessidades.actual)}</span>
+            </div>
+            <div className="mt-1 text-[11px] font-semibold flex items-center gap-1">
+              {summary.rule503020Status.necessidadesOk ? (
+                <span className="text-emerald-700 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Dentro da meta ({formatPercent(summary.categories.necessidades.actualPercent)})
+                </span>
+              ) : (
+                <span className="text-rose-700 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-rose-600" /> Acima da meta ({formatPercent(summary.categories.necessidades.actualPercent)})
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Pilar 2: Desejos (30%) */}
+          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="font-bold text-amber-800 flex items-center gap-1">
+                🍿 30% Desejos Pessoais
+              </span>
+              <span className="text-[11px] font-mono text-slate-500">Teto: {formatCurrency(totalIncome * 0.3)}</span>
+            </div>
+            <div className="text-xs text-slate-500 mb-2">
+              Estilo de vida (restaurantes, lazer, streaming, hobbies, compras).
+            </div>
+            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+              <span className="text-slate-600">Gasto Atual:</span>
+              <span className="font-bold font-mono text-slate-900">{formatCurrency(summary.categories.desejos.actual)}</span>
+            </div>
+            <div className="mt-1 text-[11px] font-semibold flex items-center gap-1">
+              {summary.rule503020Status.desejosOk ? (
+                <span className="text-emerald-700 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Dentro da meta ({formatPercent(summary.categories.desejos.actualPercent)})
+                </span>
+              ) : (
+                <span className="text-rose-700 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-rose-600" /> Acima da meta ({formatPercent(summary.categories.desejos.actualPercent)})
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Pilar 3: Investimentos (20%) */}
+          <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+            <div className="flex items-center justify-between text-xs mb-1">
+              <span className="font-bold text-emerald-800 flex items-center gap-1">
+                🌱 20% Investimentos
+              </span>
+              <span className="text-[11px] font-mono text-slate-500">Mínimo: {formatCurrency(totalIncome * 0.2)}</span>
+            </div>
+            <div className="text-xs text-slate-500 mb-2">
+              Seu futuro (reserva de emergência, aposentadoria, ações, CDI).
+            </div>
+            <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+              <span className="text-slate-600">Aporte Atual:</span>
+              <span className="font-bold font-mono text-slate-900">{formatCurrency(summary.categories.investimentos.actual)}</span>
+            </div>
+            <div className="mt-1 text-[11px] font-semibold flex items-center gap-1">
+              {summary.rule503020Status.investimentosOk ? (
+                <span className="text-emerald-700 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Meta atingida! ({formatPercent(summary.categories.investimentos.actualPercent)})
+                </span>
+              ) : (
+                <span className="text-amber-700 flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-amber-600" /> Abaixo de 20% ({formatPercent(summary.categories.investimentos.actualPercent)})
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. BARRA DE FÓRMULA ESTILO GOOGLE SHEETS (FX) */}
+      <div className="bg-slate-50 px-4 py-2 border-b border-slate-200 flex items-center gap-3 text-xs font-mono overflow-x-auto no-scrollbar">
+        <span className="text-blue-700 font-bold px-2 py-0.5 rounded bg-blue-100 border border-blue-200">
           fx
         </span>
-        <span className="text-slate-500">B2 (Renda Líquida):</span>
-        <span className="text-slate-300 font-semibold">{formatCurrency(totalIncome)}</span>
-        <span className="text-slate-600">|</span>
-        <span className="text-slate-500">Saldo Livre (= Renda - Realizado):</span>
-        <span className={`font-semibold ${summary.balanceActual >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+        <span className="text-slate-600 whitespace-nowrap">
+          Saldo Livre = Renda Líquida ({formatCurrency(totalIncome)}) - Gastos Reais ({formatCurrency(summary.totalActualExpenses)}) =
+        </span>
+        <span
+          className={`font-bold whitespace-nowrap px-2 py-0.5 rounded ${
+            summary.balanceActual >= 0
+              ? 'text-emerald-800 bg-emerald-50 border border-emerald-200'
+              : 'text-rose-800 bg-rose-50 border border-rose-200'
+          }`}
+        >
           {formatCurrency(summary.balanceActual)}
         </span>
       </div>
 
-      {/* Caixa de Entrada de Renda Superior */}
-      <div className="p-4 bg-slate-850 border-b border-slate-800/80 flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-300">💰 Sua Renda Mensal Líquida:</span>
-          {editingIncome ? (
-            <div className="flex items-center gap-1">
-              <input
-                type="number"
-                value={tempIncome}
-                onChange={(e) => setTempIncome(e.target.value)}
-                onBlur={handleIncomeSubmit}
-                onKeyDown={(e) => e.key === 'Enter' && handleIncomeSubmit()}
-                autoFocus
-                className="w-28 px-2 py-1 bg-slate-900 border border-emerald-500 rounded text-xs font-mono text-emerald-300 focus:outline-none"
-              />
-              <button
-                onClick={handleIncomeSubmit}
-                className="px-2 py-1 bg-emerald-600 text-white rounded text-xs font-bold"
-              >
-                Salvar
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => {
-                setTempIncome(totalIncome.toString());
-                setEditingIncome(true);
-              }}
-              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-emerald-400 font-mono text-xs font-bold transition-colors cursor-pointer"
-              title="Clique para editar sua renda"
-            >
-              {formatCurrency(totalIncome)} ✏️
-            </button>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onAddItem('NECESSIDADE')}
-            className="px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
-          >
-            <Plus className="w-3 h-3" /> + Necessidade
-          </button>
-          <button
-            onClick={() => onAddItem('DESEJO')}
-            className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
-          >
-            <Plus className="w-3 h-3" /> + Desejo
-          </button>
-          <button
-            onClick={() => onAddItem('INVESTIMENTO')}
-            className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1 transition-colors"
-          >
-            <Plus className="w-3 h-3" /> + Investimento
-          </button>
-        </div>
+      {/* Dica para Usuário no Mobile */}
+      <div className="px-4 py-1.5 bg-amber-50/60 border-b border-amber-100 text-[11px] text-amber-800 flex items-center gap-1.5 md:hidden">
+        <Info className="w-3.5 h-3.5 flex-shrink-0 text-amber-600" />
+        <span>Arraste a tabela para os lados para ver e editar todos os campos.</span>
       </div>
 
-      {/* Tabela Interativa de Linhas e Colunas */}
+      {/* 4. GRADE DA PLANILHA (TABELA PRINCIPAL) */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-950/80 text-[11px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-800">
-              <th className="py-2.5 px-3 w-10 text-center border-r border-slate-800/60">#</th>
-              <th className="py-2.5 px-3 border-r border-slate-800/60">Categoria</th>
-              <th className="py-2.5 px-4 border-r border-slate-800/60">Descrição / Item (Coluna C)</th>
-              <th className="py-2.5 px-3 text-right border-r border-slate-800/60 w-32">Previsto (Col D)</th>
-              <th className="py-2.5 px-3 text-right border-r border-slate-800/60 w-32">Realizado (Col E)</th>
-              <th className="py-2.5 px-3 text-right border-r border-slate-800/60 w-28">Diferença (=D-E)</th>
-              <th className="py-2.5 px-3 text-right border-r border-slate-800/60 w-24">% Renda</th>
-              <th className="py-2.5 px-2 text-center w-10">Ações</th>
+        <table className="w-full text-left text-xs">
+          <thead className="bg-slate-100/80 border-b border-slate-200 text-slate-700 font-bold select-none">
+            <tr>
+              <th className="py-3 px-3 w-12 text-center text-slate-400 font-mono">#</th>
+              <th className="py-3 px-3 min-w-[150px]">Categoria (50/30/20)</th>
+              <th className="py-3 px-4 min-w-[200px]">Nome do Item / Descrição</th>
+              <th className="py-3 px-3 min-w-[130px]">Valor Previsto (R$)</th>
+              <th className="py-3 px-3 min-w-[130px]">Valor Realizado (R$)</th>
+              <th className="py-3 px-3 min-w-[130px]">Diferença (R$)</th>
+              <th className="py-3 px-2 w-12 text-center">Ação</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 text-xs font-sans">
-            {items.map((item, idx) => {
+          <tbody className="divide-y divide-slate-100 font-medium">
+            {items.map((item, index) => {
               const diff = item.planned - item.actual;
-              const percentIncome = (item.actual / Math.max(1, totalIncome)) * 100;
-              const isOverBudget = item.actual > item.planned;
+              const isOver = item.actual > item.planned && item.planned > 0;
 
               return (
-                <tr key={item.id} className="hover:bg-slate-800/50 transition-colors group">
-                  {/* Coordenada da Linha */}
-                  <td className="py-2 px-3 text-center font-mono text-slate-500 bg-slate-950/40 border-r border-slate-800/60 text-[11px]">
-                    {idx + 3}
+                <tr
+                  key={item.id}
+                  className="hover:bg-blue-50/30 transition-colors group"
+                >
+                  {/* Linha # */}
+                  <td className="py-2.5 px-3 text-center text-slate-400 font-mono text-[11px]">
+                    {index + 1}
                   </td>
 
                   {/* Categoria */}
-                  <td className="py-2 px-3 border-r border-slate-800/60">
+                  <td className="py-2.5 px-3 whitespace-nowrap">
                     {getCategoryBadge(item.category)}
                   </td>
 
                   {/* Nome do Item */}
-                  <td className="py-2 px-4 border-r border-slate-800/60">
+                  <td className="py-2.5 px-4">
                     <input
                       type="text"
                       value={item.name}
                       onChange={(e) => onItemChange(item.id, 'name', e.target.value)}
-                      className="w-full bg-transparent text-slate-200 focus:bg-slate-800 focus:outline-none px-1.5 py-0.5 rounded border border-transparent focus:border-slate-600 transition-colors"
+                      className="w-full bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-slate-300 focus:border-blue-500 rounded-lg px-2 py-1 text-slate-900 transition-colors font-medium focus:outline-none"
                     />
                   </td>
 
-                  {/* Previsto (Editável) */}
-                  <td className="py-2 px-3 text-right font-mono border-r border-slate-800/60">
-                    <input
-                      type="number"
-                      step="10"
-                      value={item.planned}
-                      onChange={(e) => onItemChange(item.id, 'planned', parseFloat(e.target.value) || 0)}
-                      className="w-full bg-transparent text-right text-slate-300 focus:bg-slate-800 focus:outline-none px-1.5 py-0.5 rounded border border-transparent focus:border-emerald-500/60 font-mono"
-                    />
+                  {/* Previsto */}
+                  <td className="py-2.5 px-3">
+                    <div className="relative flex items-center">
+                      <span className="text-slate-400 text-[11px] absolute left-2 font-mono">R$</span>
+                      <input
+                        type="number"
+                        step="10"
+                        value={item.planned}
+                        onChange={(e) =>
+                          onItemChange(item.id, 'planned', parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-slate-300 focus:border-blue-500 rounded-lg pl-7 pr-2 py-1 text-slate-800 font-mono transition-colors focus:outline-none"
+                      />
+                    </div>
                   </td>
 
-                  {/* Realizado (Editável) */}
-                  <td className="py-2 px-3 text-right font-mono border-r border-slate-800/60">
-                    <input
-                      type="number"
-                      step="10"
-                      value={item.actual}
-                      onChange={(e) => onItemChange(item.id, 'actual', parseFloat(e.target.value) || 0)}
-                      className={`w-full bg-transparent text-right font-bold focus:bg-slate-800 focus:outline-none px-1.5 py-0.5 rounded border border-transparent focus:border-emerald-500/60 font-mono ${
-                        isOverBudget ? 'text-rose-400' : 'text-slate-100'
+                  {/* Realizado */}
+                  <td className="py-2.5 px-3">
+                    <div className="relative flex items-center">
+                      <span className="text-slate-400 text-[11px] absolute left-2 font-mono">R$</span>
+                      <input
+                        type="number"
+                        step="10"
+                        value={item.actual}
+                        onChange={(e) =>
+                          onItemChange(item.id, 'actual', parseFloat(e.target.value) || 0)
+                        }
+                        className="w-full bg-transparent hover:bg-white focus:bg-white border border-transparent hover:border-slate-300 focus:border-blue-500 rounded-lg pl-7 pr-2 py-1 text-slate-900 font-mono font-bold transition-colors focus:outline-none"
+                      />
+                    </div>
+                  </td>
+
+                  {/* Diferença */}
+                  <td className="py-2.5 px-3 font-mono whitespace-nowrap">
+                    <span
+                      className={`font-semibold ${
+                        diff >= 0 ? 'text-emerald-700' : 'text-rose-600'
                       }`}
-                    />
+                    >
+                      {formatCurrency(diff)}
+                    </span>
+                    {isOver && (
+                      <span className="ml-1 text-[10px] text-rose-600 font-sans font-bold">
+                        (Estourou)
+                      </span>
+                    )}
                   </td>
 
-                  {/* Diferença (Fórmula) */}
-                  <td
-                    className={`py-2 px-3 text-right font-mono font-semibold border-r border-slate-800/60 ${
-                      diff >= 0 ? 'text-emerald-400' : 'text-rose-400'
-                    }`}
-                  >
-                    {formatCurrency(diff)}
-                  </td>
-
-                  {/* % da Renda (Fórmula) */}
-                  <td className="py-2 px-3 text-right font-mono text-slate-400 border-r border-slate-800/60">
-                    {formatPercent(percentIncome)}
-                  </td>
-
-                  {/* Excluir */}
-                  <td className="py-2 px-2 text-center">
+                  {/* Ação: Deletar */}
+                  <td className="py-2.5 px-2 text-center">
                     <button
                       onClick={() => onDeleteItem(item.id)}
-                      className="text-slate-600 hover:text-rose-400 p-1 rounded transition-colors opacity-0 group-hover:opacity-100"
-                      title="Excluir item"
+                      className="p-1.5 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors opacity-80 group-hover:opacity-100"
+                      title="Excluir este item"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -216,30 +332,28 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
             })}
           </tbody>
 
-          {/* Linha de Totais da Planilha */}
-          <tfoot>
-            <tr className="bg-slate-950 font-bold border-t-2 border-slate-700 text-xs text-slate-200">
-              <td className="py-3 px-3 text-center font-mono text-emerald-400">Σ</td>
-              <td className="py-3 px-3" colSpan={2}>
-                TOTAL GERAL DE DESPESAS (=SOMA)
+          {/* LINHA DE TOTAIS (RODAPÉ DA PLANILHA) */}
+          <tfoot className="bg-slate-50 border-t-2 border-slate-200 font-bold text-slate-900">
+            <tr>
+              <td className="py-3 px-3 text-center text-slate-400 font-mono">∑</td>
+              <td className="py-3 px-3">TOTAIS DA PLANILHA</td>
+              <td className="py-3 px-4 text-slate-500 text-[11px]">
+                {items.length} itens cadastrados
               </td>
-              <td className="py-3 px-3 text-right font-mono text-slate-300">
+              <td className="py-3 px-3 font-mono text-slate-800">
                 {formatCurrency(summary.totalPlannedExpenses)}
               </td>
-              <td className="py-3 px-3 text-right font-mono text-white text-sm">
+              <td className="py-3 px-3 font-mono text-blue-700 text-sm">
                 {formatCurrency(summary.totalActualExpenses)}
               </td>
-              <td
-                className={`py-3 px-3 text-right font-mono text-sm ${
-                  summary.totalPlannedExpenses - summary.totalActualExpenses >= 0
-                    ? 'text-emerald-400'
-                    : 'text-rose-400'
-                }`}
-              >
-                {formatCurrency(summary.totalPlannedExpenses - summary.totalActualExpenses)}
-              </td>
-              <td className="py-3 px-3 text-right font-mono text-slate-300">
-                {formatPercent((summary.totalActualExpenses / Math.max(1, totalIncome)) * 100)}
+              <td className="py-3 px-3 font-mono">
+                <span
+                  className={
+                    summary.balanceActual >= 0 ? 'text-emerald-700' : 'text-rose-600'
+                  }
+                >
+                  {formatCurrency(summary.balanceActual)}
+                </span>
               </td>
               <td></td>
             </tr>
@@ -247,75 +361,36 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
         </table>
       </div>
 
-      {/* Resumo da Regra 50/30/20 abaixo da Grade */}
-      <div className="bg-slate-950/70 p-4 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {/* Necessidades */}
-        <div
-          className={`p-3 rounded-xl border ${
-            summary.rule503020Status.necessidadesOk
-              ? 'bg-blue-950/30 border-blue-500/30'
-              : 'bg-rose-950/30 border-rose-500/40'
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-bold text-blue-400">1. Necessidades (Meta: 50%)</span>
-            <span
-              className={`font-mono font-bold ${
-                summary.rule503020Status.necessidadesOk ? 'text-emerald-400' : 'text-rose-400'
-              }`}
-            >
-              {formatPercent(summary.categories.necessidades.actualPercent)}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400">
-            Realizado: {formatCurrency(summary.categories.necessidades.actual)} de {formatCurrency(totalIncome * 0.5)}
-          </p>
+      {/* 5. BOTÕES RÁPIDOS PARA ADICIONAR NOVOS ITENS POR CATEGORIA */}
+      <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 flex-wrap">
+        <div className="text-xs font-semibold text-slate-600">
+          Adicionar novo gasto à planilha:
         </div>
 
-        {/* Desejos */}
-        <div
-          className={`p-3 rounded-xl border ${
-            summary.rule503020Status.desejosOk
-              ? 'bg-amber-950/30 border-amber-500/30'
-              : 'bg-rose-950/30 border-rose-500/40'
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-bold text-amber-400">2. Desejos (Meta: 30%)</span>
-            <span
-              className={`font-mono font-bold ${
-                summary.rule503020Status.desejosOk ? 'text-emerald-400' : 'text-rose-400'
-              }`}
-            >
-              {formatPercent(summary.categories.desejos.actualPercent)}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400">
-            Realizado: {formatCurrency(summary.categories.desejos.actual)} de {formatCurrency(totalIncome * 0.3)}
-          </p>
-        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => onAddItem('NECESSIDADE')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-semibold transition-colors shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Necessidade (50%)</span>
+          </button>
 
-        {/* Investimentos */}
-        <div
-          className={`p-3 rounded-xl border ${
-            summary.rule503020Status.investimentosOk
-              ? 'bg-emerald-950/30 border-emerald-500/30'
-              : 'bg-amber-950/30 border-amber-500/40'
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-bold text-emerald-400">3. Investimentos (Meta: ≥20%)</span>
-            <span
-              className={`font-mono font-bold ${
-                summary.rule503020Status.investimentosOk ? 'text-emerald-400' : 'text-amber-400'
-              }`}
-            >
-              {formatPercent(summary.categories.investimentos.actualPercent)}
-            </span>
-          </div>
-          <p className="text-[11px] text-slate-400">
-            Aporte: {formatCurrency(summary.categories.investimentos.actual)} de {formatCurrency(totalIncome * 0.2)}
-          </p>
+          <button
+            onClick={() => onAddItem('DESEJO')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-semibold transition-colors shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Desejo (30%)</span>
+          </button>
+
+          <button
+            onClick={() => onAddItem('INVESTIMENTO')}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold transition-colors shadow-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+ Investimento (20%)</span>
+          </button>
         </div>
       </div>
     </div>

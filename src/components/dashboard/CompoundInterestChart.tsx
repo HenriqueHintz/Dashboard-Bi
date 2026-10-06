@@ -34,13 +34,13 @@ export const CompoundInterestChart: React.FC<CompoundInterestChartProps> = ({ pr
   const finalYear = projections[projections.length - 1];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between">
+    <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between">
       <div className="flex items-center justify-between gap-2 mb-2">
-        <h3 className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-          <TrendingUp className="w-4 h-4 text-blue-400" />
+        <h3 className="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+          <TrendingUp className="w-4 h-4 text-indigo-600" />
           Curva de Multiplicação Patrimonial
         </h3>
-        <span className="text-[11px] font-mono text-emerald-400 font-bold">
+        <span className="text-xs font-mono text-emerald-700 font-extrabold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
           {finalYear ? formatCurrency(finalYear.totalAccumulated) : ''}
         </span>
       </div>
@@ -54,44 +54,44 @@ export const CompoundInterestChart: React.FC<CompoundInterestChartProps> = ({ pr
             preserveAspectRatio="none"
           >
             <defs>
-              <linearGradient id="blueGlow" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+              <linearGradient id="blueLightGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
+                <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
               </linearGradient>
             </defs>
 
             {/* Grid lines */}
-            <line x1="0" y1={chartHeight * 0.25} x2={chartWidth} y2={chartHeight * 0.25} stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
-            <line x1="0" y1={chartHeight * 0.5} x2={chartWidth} y2={chartHeight * 0.5} stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
-            <line x1="0" y1={chartHeight * 0.75} x2={chartWidth} y2={chartHeight * 0.75} stroke="#334155" strokeDasharray="3 3" strokeWidth="0.5" />
+            <line x1="0" y1={chartHeight * 0.25} x2={chartWidth} y2={chartHeight * 0.25} stroke="#e2e8f0" strokeDasharray="3 3" strokeWidth="1" />
+            <line x1="0" y1={chartHeight * 0.5} x2={chartWidth} y2={chartHeight * 0.5} stroke="#e2e8f0" strokeDasharray="3 3" strokeWidth="1" />
+            <line x1="0" y1={chartHeight * 0.75} x2={chartWidth} y2={chartHeight * 0.75} stroke="#e2e8f0" strokeDasharray="3 3" strokeWidth="1" />
 
             {/* Área Acumulada */}
-            <path d={areaAccumulatedPath} fill="url(#blueGlow)" />
+            <path d={areaAccumulatedPath} fill="url(#blueLightGradient)" />
 
-            {/* Linha Investida (Cinza) */}
-            <path d={lineInvestedPath} fill="none" stroke="#64748b" strokeWidth="2" strokeDasharray="4 2" />
+            {/* Linha Investida (Cinza pontilhada) */}
+            <path d={lineInvestedPath} fill="none" stroke="#94a3b8" strokeWidth="2" strokeDasharray="4 2" />
 
-            {/* Linha Acumulada (Azul brilhante) */}
-            <path d={lineAccumulatedPath} fill="none" stroke="#38bdf8" strokeWidth="2.5" />
+            {/* Linha Acumulada (Azul sólida) */}
+            <path d={lineAccumulatedPath} fill="none" stroke="#2563eb" strokeWidth="2.5" />
           </svg>
         </div>
 
         {/* Eixo de Anos */}
-        <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono mt-1 pt-1 border-t border-slate-800">
+        <div className="flex justify-between items-center text-[10px] text-slate-400 font-mono mt-1 pt-1 border-t border-slate-100">
           <span>Ano 1</span>
           <span>Ano {Math.round(projections.length / 2)}</span>
           <span>Ano {projections.length}</span>
         </div>
       </div>
 
-      {/* Legenda */}
-      <div className="flex items-center justify-between text-[11px] pt-2 border-t border-slate-800/80 font-mono">
-        <div className="flex items-center gap-1.5 text-sky-400 font-semibold">
-          <span className="w-2.5 h-1 bg-sky-400 rounded-full" />
-          <span>Patrimônio Total</span>
+      {/* Legenda Didática */}
+      <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100">
+        <div className="flex items-center gap-1.5 text-blue-700 font-semibold">
+          <span className="w-2.5 h-1.5 bg-blue-600 rounded-full" />
+          <span>Patrimônio Total (com juros)</span>
         </div>
-        <div className="flex items-center gap-1.5 text-slate-400">
-          <span className="w-2.5 h-1 bg-slate-500 rounded-full" />
+        <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+          <span className="w-2.5 h-1.5 bg-slate-400 rounded-full" />
           <span>Aportado do Bolso</span>
         </div>
       </div>

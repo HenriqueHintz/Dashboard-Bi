@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, ShieldAlert, TrendingUp, BookOpen } from 'lucide-react';
+import { Table, ShieldCheck, TrendingUp, BookOpen } from 'lucide-react';
 
 export type TabKey = 'BUDGET' | 'EMERGENCY' | 'INVESTMENTS' | 'GLOSSARY';
 
@@ -12,32 +12,32 @@ export const TabsBar: React.FC<TabsBarProps> = ({ activeTab, onTabChange }) => {
   const tabs = [
     {
       key: 'BUDGET' as TabKey,
-      label: '1. Orçamento Mensal (50/30/20)',
+      label: '1. Orçamento (Regra 50/30/20)',
       icon: Table,
-      color: 'text-emerald-400',
+      activeColor: 'text-blue-600',
     },
     {
       key: 'EMERGENCY' as TabKey,
       label: '2. Reserva de Emergência',
-      icon: ShieldAlert,
-      color: 'text-amber-400',
+      icon: ShieldCheck,
+      activeColor: 'text-emerald-600',
     },
     {
       key: 'INVESTMENTS' as TabKey,
       label: '3. Simulador de Investimentos',
       icon: TrendingUp,
-      color: 'text-blue-400',
+      activeColor: 'text-indigo-600',
     },
     {
       key: 'GLOSSARY' as TabKey,
-      label: '4. Glossário Financeiro',
+      label: '4. Glossário Didático',
       icon: BookOpen,
-      color: 'text-purple-400',
+      activeColor: 'text-purple-600',
     },
   ];
 
   return (
-    <div className="flex items-center gap-1 bg-slate-900 border-b border-slate-700/80 px-3 pt-2 overflow-x-auto no-scrollbar">
+    <div className="flex items-center gap-1 bg-white border-b border-slate-200 px-3 pt-2 overflow-x-auto no-scrollbar">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.key;
@@ -46,13 +46,13 @@ export const TabsBar: React.FC<TabsBarProps> = ({ activeTab, onTabChange }) => {
           <button
             key={tab.key}
             onClick={() => onTabChange(tab.key)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold whitespace-nowrap transition-all border-t-2 ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold whitespace-nowrap transition-all border-b-2 ${
               isActive
-                ? 'bg-slate-800 text-white border-emerald-500 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 border-transparent hover:bg-slate-800/50'
+                ? 'bg-blue-50/70 text-blue-800 border-blue-600 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 border-transparent hover:bg-slate-100/60'
             }`}
           >
-            <Icon className={`w-3.5 h-3.5 ${isActive ? tab.color : 'text-slate-500'}`} />
+            <Icon className={`w-4 h-4 ${isActive ? tab.activeColor : 'text-slate-400'}`} />
             <span>{tab.label}</span>
           </button>
         );

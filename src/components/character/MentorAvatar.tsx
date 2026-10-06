@@ -25,35 +25,35 @@ export const MentorAvatar: React.FC<MentorAvatarProps> = ({ mood, size = 'md' })
   const getBorderColor = () => {
     switch (mood) {
       case 'CELEBRATING':
-        return 'border-amber-400 shadow-amber-500/30';
+        return 'border-amber-400 shadow-amber-200';
       case 'EXCITED':
-        return 'border-emerald-400 shadow-emerald-500/30';
+        return 'border-emerald-500 shadow-emerald-200';
       case 'TEACHING':
-        return 'border-blue-400 shadow-blue-500/30';
+        return 'border-blue-500 shadow-blue-200';
       case 'THINKING':
-        return 'border-purple-400 shadow-purple-500/30';
+        return 'border-purple-400 shadow-purple-200';
       default:
-        return 'border-slate-500 shadow-slate-500/20';
+        return 'border-slate-300 shadow-slate-200';
     }
   };
 
   const sizeClasses = {
     sm: 'w-10 h-10 text-xl',
-    md: 'w-14 h-14 text-2xl',
-    lg: 'w-20 h-20 text-4xl',
+    md: 'w-13 h-13 text-2xl',
+    lg: 'w-18 h-18 text-3xl',
   }[size];
 
   return (
-    <div className="relative inline-block select-none">
-      {/* Glow e Avatar */}
+    <div className="relative inline-block select-none flex-shrink-0">
+      {/* Glow e Avatar em Fundo Claro */}
       <div
-        className={`${sizeClasses} rounded-2xl bg-gradient-to-br from-slate-800 via-slate-900 to-emerald-950 border-2 ${getBorderColor()} shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-105`}
+        className={`${sizeClasses} rounded-2xl bg-gradient-to-br from-blue-50 via-slate-50 to-emerald-50 border-2 ${getBorderColor()} shadow-md flex items-center justify-center transition-all duration-300 transform hover:scale-105`}
       >
         <span className="animate-pulse-subtle">🦉</span>
       </div>
 
       {/* Badge do Humor */}
-      <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-slate-900 border border-slate-700 shadow flex items-center justify-center text-xs">
+      <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-xs">
         {getMoodEmoji()}
       </div>
     </div>
