@@ -112,7 +112,7 @@ export function calculateBudgetSummary(totalIncome: number, items: BudgetItem[])
 export function calculateEmergencyFund(config: EmergencyFundConfig): EmergencyFundStatus {
   const targetAmount = (config.monthlyEssentialCost || 0) * (config.targetMonths || 6);
   const currentAmount = config.currentSaved || 0;
-  const percentageCompleted = targetAmount > 0 ? Math.min(100, (currentAmount / targetAmount) * 100) : 100;
+  const percentageCompleted = targetAmount > 0 ? Math.min(100, (currentAmount / targetAmount) * 100) : 0;
   
   const remainingValue = Math.max(0, targetAmount - currentAmount);
   const monthlyDeposit = Math.max(1, config.monthlyDeposit || 1);

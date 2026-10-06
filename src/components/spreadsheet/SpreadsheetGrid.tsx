@@ -76,21 +76,22 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
           </div>
 
           <div className="flex items-center gap-2 w-full md:w-auto">
-            {editingIncome ? (
+            {editingIncome || totalIncome === 0 ? (
               <div className="flex items-center gap-1.5 w-full md:w-auto">
                 <span className="text-xs font-bold text-slate-500">R$</span>
                 <input
                   type="number"
-                  value={tempIncome}
+                  placeholder="Ex: 5000"
+                  value={tempIncome === '0' ? '' : tempIncome}
                   onChange={(e) => setTempIncome(e.target.value)}
                   className="bg-white border-2 border-blue-600 rounded-xl px-3 py-2 text-sm font-bold text-slate-900 w-36 focus:outline-none shadow-sm"
-                  autoFocus
+                  autoFocus={editingIncome}
                 />
                 <button
                   onClick={handleIncomeSubmit}
                   className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all"
                 >
-                  Confirmar
+                  Salvar Renda
                 </button>
               </div>
             ) : (
@@ -240,7 +241,22 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 font-medium">
-            {items.map((item, index) => {
+            {items.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="py-12 text-center text-slate-500 bg-slate-50/40">
+                  <div className="max-w-md mx-auto space-y-2">
+                    <div className="text-2xl">📝</div>
+                    <p className="text-sm font-bold text-slate-800">Nenhum gasto cadastrado ainda</p>
+                    <p className="text-xs text-slate-500">
+                      {totalIncome === 0
+                        ? 'Digite sua renda acima e clique em um dos botões abaixo para lançar suas despesas.'
+                        : 'Clique nos botões abaixo (+ Necessidade, + Desejo ou + Investimento) para lançar um gasto.'}
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              items.map((item, index) => {
               const diff = item.planned - item.actual;
               const isOver = item.actual > item.planned && item.planned > 0;
 
@@ -329,7 +345,8 @@ export const SpreadsheetGrid: React.FC<SpreadsheetGridProps> = ({
                   </td>
                 </tr>
               );
-            })}
+            })
+          )}
           </tbody>
 
           {/* LINHA DE TOTAIS (RODAPÉ DA PLANILHA) */}
