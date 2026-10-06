@@ -21,8 +21,6 @@ import { EmergencyFundTab } from './components/spreadsheet/EmergencyFundTab';
 import { InvestmentSimulationTab } from './components/spreadsheet/InvestmentSimulationTab';
 import { FinancialGlossary } from './components/glossary/FinancialGlossary';
 import { KpiCards } from './components/dashboard/KpiCards';
-import { AllocationChart } from './components/dashboard/AllocationChart';
-import { CompoundInterestChart } from './components/dashboard/CompoundInterestChart';
 
 // Ícones
 import { Download, Trash2, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
@@ -30,7 +28,7 @@ import { Download, Trash2, FileSpreadsheet, CheckCircle2 } from 'lucide-react';
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabKey>('BUDGET');
 
-  // Inicializa sem nenhum registro pré-preenchido para o usuário preencher livremente
+  // Inicializa sem nenhum registro para o usuário preencher livremente
   const [income, setIncome] = useState<number>(0);
   const [items, setItems] = useState<BudgetItem[]>([]);
   const [emergencyConfig, setEmergencyConfig] = useState<EmergencyFundConfig>({
@@ -47,7 +45,7 @@ export default function App() {
   });
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Cálculos reativos em tempo real
+  // Cálculos em tempo real
   const summary = useMemo(() => calculateBudgetSummary(income, items), [income, items]);
   const emergencyStatus = useMemo(() => calculateEmergencyFund(emergencyConfig), [emergencyConfig]);
   const projections = useMemo(
@@ -60,7 +58,7 @@ export default function App() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Handlers da Planilha
+  // Handlers
   const handleIncomeChange = (newIncome: number) => {
     setIncome(newIncome);
     showToast('Renda mensal atualizada!');
@@ -92,7 +90,7 @@ export default function App() {
       note: '',
     };
     setItems((prev) => [...prev, newItem]);
-    showToast('Linha adicionada! Digite o nome e o valor.');
+    showToast('Linha adicionada!');
   };
 
   const handleDeleteItem = (id: string) => {
@@ -109,7 +107,7 @@ export default function App() {
     setCompoundConfig((prev) => ({ ...prev, [field]: val }));
   };
 
-  // Exportação Excel Oficial
+  // Exportar Excel
   const handleExportExcel = () => {
     sound.playMissionComplete();
     exportFinancialSpreadsheetToExcel({
@@ -119,10 +117,10 @@ export default function App() {
       emergencyConfig,
       projections,
     });
-    showToast('Planilha Excel (.xlsx) baixada com sucesso!');
+    showToast('Planilha Excel baixada com sucesso!');
   };
 
-  // Limpar todos os registros
+  // Limpar dados
   const handleClearAll = () => {
     if (window.confirm('Deseja limpar todos os valores da planilha?')) {
       setIncome(0);
@@ -139,17 +137,17 @@ export default function App() {
         annualInterestRate: 10,
         years: 10,
       });
-      showToast('Planilha zerada com sucesso!');
+      showToast('Planilha zerada!');
     }
   };
 
-  // Carregar dados de exemplo (opcional para demonstração rápida)
+  // Carregar demonstração
   const handleLoadDemo = () => {
     setIncome(DEFAULT_INCOME);
     setItems(DEFAULT_BUDGET_ITEMS);
     setEmergencyConfig(DEFAULT_EMERGENCY_CONFIG);
     setCompoundConfig(DEFAULT_COMPOUND_CONFIG);
-    showToast('Dados de exemplo carregados.');
+    showToast('Exemplo carregado.');
   };
 
   return (
@@ -162,16 +160,14 @@ export default function App() {
         </div>
       )}
 
-      {/* Top Navbar Limpa: Sem Logo, apenas "Planilha Financeira" */}
-      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 shadow-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-          {/* Título Direto */}
-          <h1 className="font-extrabold text-lg sm:text-xl text-slate-900 tracking-tight">
+      {/* Top Navbar Limpa */}
+      <header className="sticky top-0 z-40 bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 shadow-xs">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+          <h1 className="font-extrabold text-xl sm:text-2xl text-slate-900 tracking-tight">
             Planilha Financeira
           </h1>
 
-          {/* Ações Rápidas */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
             {items.length === 0 && income === 0 && (
               <button
                 onClick={handleLoadDemo}
@@ -190,35 +186,29 @@ export default function App() {
                 title="Limpar todos os campos da planilha"
               >
                 <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                <span>Limpar Planilha</span>
+                <span>Limpar</span>
               </button>
             )}
 
             <button
               onClick={handleExportExcel}
-              className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm active:scale-95"
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm transition-all shadow-sm active:scale-95"
               title="Baixar arquivo Excel (.xlsx)"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-4 h-4" />
               <span>Exportar Excel</span>
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 space-y-5">
-        {/* KPIs Principais no Topo */}
-        <KpiCards summary={summary} />
-
-        {/* Gráficos de Resumo (só ocupam espaço relevante se houver dados ou projeções) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <AllocationChart summary={summary} />
-          <CompoundInterestChart projections={projections} />
-        </div>
+      {/* Main Container - Foco e Simplicidade */}
+      <main className="flex-1 max-w-6xl w-full mx-auto p-3 sm:p-6 space-y-6">
+        {/* 3 Grandes Números Principais no Topo (Renda, Gastos, Saldo) */}
+        <KpiCards summary={summary} onIncomeChange={handleIncomeChange} />
 
         {/* Área da Planilha com Abas */}
-        <section className="space-y-0 shadow-sm rounded-2xl overflow-hidden border border-slate-200 bg-white">
+        <section className="space-y-0 shadow-xs rounded-2xl overflow-hidden border border-slate-200 bg-white">
           <TabsBar activeTab={activeTab} onTabChange={setActiveTab} />
 
           {/* Conteúdo da Aba Ativa */}
@@ -254,19 +244,15 @@ export default function App() {
         </section>
 
         {/* Footer Simples */}
-        <footer className="pt-6 pb-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div>Planilha Financeira • Cálculos em Tempo Real</div>
+        <footer className="pt-4 pb-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <div>Planilha Financeira • Regra 50/30/20</div>
 
-          <div className="flex items-center gap-4 text-slate-500">
-            <span>Regra 50/30/20</span>
-            <span>•</span>
-            <button
-              onClick={handleExportExcel}
-              className="text-emerald-700 hover:underline font-bold"
-            >
-              Baixar .XLSX
-            </button>
-          </div>
+          <button
+            onClick={handleExportExcel}
+            className="text-emerald-700 hover:underline font-bold"
+          >
+            Baixar Planilha Excel (.xlsx)
+          </button>
         </footer>
       </main>
     </div>
